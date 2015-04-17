@@ -93,8 +93,8 @@ public class Breakout extends GraphicsProgram {
 	// calls helper functions that create and place each of the game objects
 	private void PlaceGameObjects() {
 		PlaceWall();
-		PlaceBall();
 		PlacePaddle();
+		PlaceBall();
 	}
 	
 	/*
@@ -138,11 +138,12 @@ public class Breakout extends GraphicsProgram {
 		return(firstBrickOffset);
 	}
 	
+	private void PlacePaddle() {
+		
+	}	
 	private void PlaceBall() {
 		
 	}
 	
-	private void PlacePaddle() {
-		
-	}
+
 }
