@@ -7,6 +7,7 @@
  * This file will eventually implement the game of Breakout.
  */
 
+
 import acm.graphics.*;
 import acm.program.*;
 import acm.util.*;
@@ -56,11 +57,98 @@ public class Breakout extends GraphicsProgram {
 
 /** Number of turns */
 	private static final int NTURNS = 3;
+	
+	
+	private static final Color[] colorArray = new Color[] {Color.RED, Color.orange, 
+		Color.yellow, Color.green, Color.BLUE};
 
-/* Method: run() */
+/* Method: run() 
+ * SetUpGame puts brick, paddle and ball on screen
+ * PlayGame starts a game of three turns
+ * 
+ * */
 /** Runs the Breakout program. */
 	public void run() {
 		/* You fill this in, along with any subsidiary methods */
+		SetUpGameInitialy();
+		
 	}
 
+	
+	// PlaceGameObjects creates and places bricks, paddle and ball on screen
+	// ResetGameStats sets turnsLeft to 0 
+	private void SetUpGameInitialy() {
+		PlaceGameObjects();
+		ResetGameStats();
+	}
+	
+	
+	// ResetGameStats set turnsLeft to 0 
+	private int ResetGameStats() {
+		int turnsLeft = 3;
+		return (turnsLeft);
+	}
+	
+	// calls helper functions that create and place each of the game objects
+	private void PlaceGameObjects() {
+		PlaceWall();
+		PlaceBall();
+		PlacePaddle();
+	}
+	
+	/*
+	 * Puts bricks of varying color in rows at the top of the screen based on constants
+	 * centerd using window size
+	 */
+	private void PlaceWall() {
+		// make row
+		// repeat 10 times - changing color every 2 times
+		
+		/* 
+		 * Initial wall traits TICKET
+		 * TICKET where should color array go?
+		 */
+		for (int currentRowNum=0; currentRowNum < (NBRICK_ROWS -1); currentRowNum++ ){
+			makeRow(currentRowNum);
+		}
+	}
+	
+	// find offset for first brick
+	// places colored bricks for n_bricks-row
+	private void makeRow(int currentRowNum) {
+		// intial values for row
+		double xBrick = getFirstBrickOffset();
+		int yBrick = currentRowNum * (BRICK_HEIGHT + BRICK_SEP) + BRICK_Y_OFFSET;
+		
+		Color rowColor = colorArray[currentRowNum / 2 ];
+		
+		for (int i = 0; i < NBRICKS_PER_ROW; i++) {
+			putNextBrick(xBrick, yBrick, rowColor);
+			xBrick += BRICK_WIDTH + BRICK_SEP;
+		}
+		
+	}
+	
+	private void putNextBrick(double xBrick, int yBrick, Color rowColor) {
+		GRect rect = new GRect(xBrick, yBrick, BRICK_WIDTH , BRICK_HEIGHT);
+		rect.setFilled(true);
+	    rect.setColor(rowColor);
+		add(rect);
+	}
+	
+	
+		private double getFirstBrickOffset() {
+			double totalBrickRowWidth = NBRICKS_PER_ROW * (BRICK_WIDTH + BRICK_SEP);
+			double extraSpaceInRow = APPLICATION_WIDTH - totalBrickRowWidth;
+			double firstBrickOffset = extraSpaceInRow / 2;
+			return(firstBrickOffset);
+	}
+	
+	private void PlaceBall() {
+		
+	}
+	
+	private void PlacePaddle() {
+		
+	}
 }
