@@ -71,13 +71,14 @@ public class Breakout extends GraphicsProgram {
 	public void run() {
 		/* You fill this in, along with any subsidiary methods */
 		SetUpGameInitialy();
-		
 	}
 
 	
 	// PlaceGameObjects creates and places bricks, paddle and ball on screen
 	// ResetGameStats sets turnsLeft to 0 
 	private void SetUpGameInitialy() {
+		// set screen size
+		setSize(APPLICATION_WIDTH, APPLICATION_HEIGHT);
 		PlaceGameObjects();
 		ResetGameStats();
 	}
@@ -99,16 +100,10 @@ public class Breakout extends GraphicsProgram {
 	/*
 	 * Puts bricks of varying color in rows at the top of the screen based on constants
 	 * centerd using window size
+	 *  repeat 10 times - changing color every 2 times
 	 */
 	private void PlaceWall() {
-		// make row
-		// repeat 10 times - changing color every 2 times
-		
-		/* 
-		 * Initial wall traits TICKET
-		 * TICKET where should color array go?
-		 */
-		for (int currentRowNum=0; currentRowNum < (NBRICK_ROWS -1); currentRowNum++ ){
+		for (int currentRowNum=0; currentRowNum < NBRICK_ROWS; currentRowNum++ ){
 			makeRow(currentRowNum);
 		}
 	}
@@ -136,12 +131,11 @@ public class Breakout extends GraphicsProgram {
 		add(rect);
 	}
 	
-	
-		private double getFirstBrickOffset() {
-			double totalBrickRowWidth = NBRICKS_PER_ROW * (BRICK_WIDTH + BRICK_SEP);
-			double extraSpaceInRow = APPLICATION_WIDTH - totalBrickRowWidth;
-			double firstBrickOffset = extraSpaceInRow / 2;
-			return(firstBrickOffset);
+	private double getFirstBrickOffset() {
+		double totalBrickRowWidth = NBRICKS_PER_ROW * (BRICK_WIDTH + BRICK_SEP);
+		double extraSpaceInRow = APPLICATION_WIDTH - totalBrickRowWidth;
+		double firstBrickOffset = (extraSpaceInRow / 2);
+		return(firstBrickOffset);
 	}
 	
 	private void PlaceBall() {
