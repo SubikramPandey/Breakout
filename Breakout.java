@@ -111,26 +111,30 @@ public class Breakout extends GraphicsProgram {
 	// find offset for first brick
 	// places colored bricks for n_bricks-row
 	private void makeRow(int currentRowNum) {
-		// intial values for row
+		// Getting initial values for row
 		double xBrick = getFirstBrickOffset();
-		int yBrick = currentRowNum * (BRICK_HEIGHT + BRICK_SEP) + BRICK_Y_OFFSET;
-		
-		Color rowColor = colorArray[currentRowNum / 2 ];
-		
+		int yBrick = getYBrick(currentRowNum);
+		// color changes every other row
+		Color rowColor = colorArray[currentRowNum / 2 ]; 
 		for (int i = 0; i < NBRICKS_PER_ROW; i++) {
-			putNextBrick(xBrick, yBrick, rowColor);
+			placeRect(xBrick, yBrick,BRICK_WIDTH , BRICK_HEIGHT, rowColor);
 			xBrick += BRICK_WIDTH + BRICK_SEP;
 		}
 		
 	}
 	
-	private void putNextBrick(double xBrick, int yBrick, Color rowColor) {
-		GRect rect = new GRect(xBrick, yBrick, BRICK_WIDTH , BRICK_HEIGHT);
+	private void placeRect(double xBrick, double yBrick, int RectWidth,
+			int RectHeight, Color rectColor) {
+		GRect rect = new GRect(xBrick, yBrick, RectWidth, RectHeight);
 		rect.setFilled(true);
-	    rect.setColor(rowColor);
+	    rect.setColor(rectColor);
 		add(rect);
 	}
 	
+	/*
+	 * used to make the entire wall centered on the screen, 
+	 * because the application window is larger then the wall
+	 */
 	private double getFirstBrickOffset() {
 		double totalBrickRowWidth = NBRICKS_PER_ROW * (BRICK_WIDTH + BRICK_SEP);
 		double extraSpaceInRow = APPLICATION_WIDTH - totalBrickRowWidth;
@@ -138,9 +142,29 @@ public class Breakout extends GraphicsProgram {
 		return(firstBrickOffset);
 	}
 	
+	// gives y value for bricks in the given row
+	private int getYBrick(int currentRowNum) {
+		return (currentRowNum * (BRICK_HEIGHT + BRICK_SEP) + BRICK_Y_OFFSET);
+	}
+	
+	
 	private void PlacePaddle() {
-		
+		double xPaddle = getXPaddle();
+		double yPaddle = getYPaddle();
+		placeRect(xPaddle, yPaddle, PADDLE_WIDTH, PADDLE_HEIGHT, Color.black);
 	}	
+	
+	private double getXPaddle() {
+		double screenMidpoint = WIDTH / 2;
+		double halfPaddleLength =  PADDLE_WIDTH / 2;
+		double xPaddle = screenMidpoint - halfPaddleLength;
+		return (xPaddle);
+	}
+	
+	private double getYPaddle() {
+		return(HEIGHT - PADDLE_Y_OFFSET);
+	}
+	
 	private void PlaceBall() {
 		
 	}
