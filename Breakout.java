@@ -71,8 +71,44 @@ public class Breakout extends GraphicsProgram {
 	public void run() {
 		/* You fill this in, along with any subsidiary methods */
 		SetUpGameInitialy();
+		playGame();
 	}
-
+	
+	
+	// starts 3 round game. Displays if user won or lost. Play again
+	private void playGame() {
+		int roundsLeft = 3;
+		int bricksLeft = NBRICK_ROWS * NBRICKS_PER_ROW;
+		while (roundsLeft > 0) {
+			setupNewRound();
+			playRound(bricksLeft);
+			roundsLeft -= 1;
+		}
+		showEndGameScreen();
+	}
+	
+	// start round conditions 
+	// starts round on user click,
+	// state vars like bricks left
+	private void setupNewRound() {
+		
+	}
+	
+	
+	// bounces ball
+	// Deletes bricks hit by the ball
+	// paddle moves when user moves mouse
+	// ends when if ball hits the bottom wall, or there are no more bricks
+	private void playRound(int bricksLeft) {
+		waitForClick();
+	}
+	
+	//shows if won or lost, gives option to play new game
+	private void showEndGameScreen() {
+		
+	}
+	
+	//public void mouseMoved(MouseEvent e) {
 	
 	// PlaceGameObjects creates and places bricks, paddle and ball on screen
 	// ResetGameStats sets turnsLeft to 0 
@@ -81,6 +117,7 @@ public class Breakout extends GraphicsProgram {
 		setSize(APPLICATION_WIDTH, APPLICATION_HEIGHT);
 		PlaceGameObjects();
 		ResetGameStats();
+		addMouseListeners();
 	}
 	
 	
@@ -120,7 +157,6 @@ public class Breakout extends GraphicsProgram {
 			placeRect(xBrick, yBrick,BRICK_WIDTH , BRICK_HEIGHT, rowColor);
 			xBrick += BRICK_WIDTH + BRICK_SEP;
 		}
-		
 	}
 	
 	private void placeRect(double xBrick, double yBrick, int RectWidth,
@@ -153,7 +189,7 @@ public class Breakout extends GraphicsProgram {
 		double yPaddle = getYPaddle();
 		placeRect(xPaddle, yPaddle, PADDLE_WIDTH, PADDLE_HEIGHT, Color.black);
 	}	
-	
+	  
 	private double getXPaddle() {
 		double screenMidpoint = WIDTH / 2;
 		double halfPaddleLength =  PADDLE_WIDTH / 2;
@@ -166,7 +202,11 @@ public class Breakout extends GraphicsProgram {
 	}
 	
 	private void PlaceBall() {
-		
+		double xBall = (WIDTH / 2) - BALL_RADIUS;
+		double yBall = (APPLICATION_HEIGHT / 2) - BALL_RADIUS;
+		GOval ball = new GOval(xBall, yBall, BALL_RADIUS, BALL_RADIUS);
+		ball.setFilled(true);
+		add(ball);
 	}
 	
 
