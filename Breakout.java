@@ -58,6 +58,8 @@ public class Breakout extends GraphicsProgram {
 /** Number of turns */
 	private static final int NTURNS = 3;
 	
+	// 
+	private  GRect paddle;
 	
 	private static final Color[] colorArray = new Color[] {Color.RED, Color.orange, 
 		Color.yellow, Color.green, Color.BLUE};
@@ -69,7 +71,6 @@ public class Breakout extends GraphicsProgram {
  * */
 /** Runs the Breakout program. */
 	public void run() {
-		/* You fill this in, along with any subsidiary methods */
 		SetUpGameInitialy();
 		playGame();
 	}
@@ -107,8 +108,6 @@ public class Breakout extends GraphicsProgram {
 	private void showEndGameScreen() {
 		
 	}
-	
-	//public void mouseMoved(MouseEvent e) {
 	
 	// PlaceGameObjects creates and places bricks, paddle and ball on screen
 	// ResetGameStats sets turnsLeft to 0 
@@ -154,17 +153,17 @@ public class Breakout extends GraphicsProgram {
 		// color changes every other row
 		Color rowColor = colorArray[currentRowNum / 2 ]; 
 		for (int i = 0; i < NBRICKS_PER_ROW; i++) {
-			placeRect(xBrick, yBrick,BRICK_WIDTH , BRICK_HEIGHT, rowColor);
+			add(placeRect(xBrick, yBrick,BRICK_WIDTH , BRICK_HEIGHT, rowColor));
 			xBrick += BRICK_WIDTH + BRICK_SEP;
 		}
 	}
 	
-	private void placeRect(double xBrick, double yBrick, int RectWidth,
+	private GRect placeRect(double xBrick, double yBrick, int RectWidth,
 			int RectHeight, Color rectColor) {
 		GRect rect = new GRect(xBrick, yBrick, RectWidth, RectHeight);
 		rect.setFilled(true);
 	    rect.setColor(rectColor);
-		add(rect);
+		return (rect);
 	}
 	
 	/*
@@ -187,7 +186,8 @@ public class Breakout extends GraphicsProgram {
 	private void PlacePaddle() {
 		double xPaddle = getXPaddle();
 		double yPaddle = getYPaddle();
-		placeRect(xPaddle, yPaddle, PADDLE_WIDTH, PADDLE_HEIGHT, Color.black);
+		paddle = placeRect(xPaddle, yPaddle, PADDLE_WIDTH, PADDLE_HEIGHT, Color.black);
+		add(paddle);
 	}	
 	  
 	private double getXPaddle() {
@@ -209,5 +209,22 @@ public class Breakout extends GraphicsProgram {
 		add(ball);
 	}
 	
+	// moves the paddle horizontally 
+	// so the the center of paddle is to mouse location 
+	// prevents paddle form moving off screen
+	public void mouseMoved(MouseEvent e) {
+		double paddleCenter = e.getX();
+		// stop paddle from going off left side of screen
+		if(paddleCenter - (PADDLE_WIDTH / 2) < 0 ) {
+			paddleCenter = (PADDLE_WIDTH / 2);
+		}
+		// stop paddle from going off screen right side
+		else if (paddleCenter +  (PADDLE_WIDTH / 2) > APPLICATION_WIDTH) {
+			paddleCenter = APPLICATION_WIDTH - (PADDLE_WIDTH / 2);
+		}
+		double xPaddle = paddleCenter - (PADDLE_WIDTH / 2);
+		paddle.setLocation(xPaddle, (HEIGHT - PADDLE_Y_OFFSET));
+		
+	}
 
 }
