@@ -58,12 +58,19 @@ public class Breakout extends GraphicsProgram {
 /** Number of turns */
 	private static final int NTURNS = 3;
 	
-	// 
-	private  GRect paddle;
-	
-	private static final Color[] colorArray = new Color[] {Color.RED, Color.orange, 
-		Color.yellow, Color.green, Color.BLUE};
 
+	private static final Color[] colorArray = new Color[] 
+			{Color.RED, Color.orange, Color.yellow, Color.green, Color.BLUE};
+
+	
+	/** Animation delay or paust time between ball moves */   
+    private static final int DELAY = 10;
+    
+    private boolean ballInPlay;
+    private int bricksLeft;
+	private static double BALL_START_X = (WIDTH / 2) - BALL_RADIUS;
+	private static double BALL_START_Y = (APPLICATION_HEIGHT / 2) - BALL_RADIUS;
+	
 /* Method: run() 
  * SetUpGame puts brick, paddle and ball on screen
  * PlayGame starts a game of three turns
@@ -78,30 +85,15 @@ public class Breakout extends GraphicsProgram {
 	
 	// starts 3 round game. Displays if user won or lost. Play again
 	private void playGame() {
-		int roundsLeft = 3;
-		int bricksLeft = NBRICK_ROWS * NBRICKS_PER_ROW;
+		int roundsLeft = NTURNS;
 		while (roundsLeft > 0) {
 			setupNewRound();
-			playRound(bricksLeft);
+			playRound();
 			roundsLeft -= 1;
+			println("end round");
 		}
+		println("End of Game");
 		showEndGameScreen();
-	}
-	
-	// start round conditions 
-	// starts round on user click,
-	// state vars like bricks left
-	private void setupNewRound() {
-		
-	}
-	
-	
-	// bounces ball
-	// Deletes bricks hit by the ball
-	// paddle moves when user moves mouse
-	// ends when if ball hits the bottom wall, or there are no more bricks
-	private void playRound(int bricksLeft) {
-		waitForClick();
 	}
 	
 	//shows if won or lost, gives option to play new game
@@ -109,21 +101,110 @@ public class Breakout extends GraphicsProgram {
 		
 	}
 	
+	// start round conditions 
+	// starts round on user click,
+	// state vars like bricks left
+	private void setupNewRound() {
+		ballInPlay = true;
+		bricksLeft = NBRICK_ROWS * NBRICKS_PER_ROW;
+		putBallInCenter();
+		println("new round");
+	}
+	
+	private void putBallInCenter() {
+		ball.setLocation(BALL_START_X, BALL_START_Y);
+	}
+	
+	// bounces ball
+	// Deletes bricks hit by the ball
+	// paddle moves when user moves mouse
+	// ends when if ball hits the bottom wall, or there are no more bricks
+	private void playRound() {
+		println("Click to start new round");
+		waitForClick();
+		intializeBallVelocity();
+		ballInPlay = true;
+		while(ballInPlay) {
+			moveBall();
+			pause(DELAY);	// slow ball movement update so game is playable
+		}
+	}
+	
+	private void intializeBallVelocity(){
+		vx = rgen.nextDouble(1.0, 3.0);
+		if (rgen.nextBoolean(0.5)) vx = -vx;
+		vy = 3;
+	}
+	
+	
+	private void moveBall() {
+		ball.move(vx, vy);
+		double ballX = ball.getX();
+		double ballY = ball.getY();
+		bounceOffWall(ballX, ballY);
+		collisions(ballX, ballY);
+	}
+	
+	
+	private void bounceOffWall(double ballX, double ballY) {
+		// bounces off sides of wall
+		if ((ballX < 0 ) | (ballX + BALL_RADIUS) > APPLICATION_WIDTH) {
+			vx = -vx;
+		}
+		// bounce off top of the screen
+		if (ballY < 0)  {vy = -vy;}
+		// ball out of play if it hits the bottom of the screen
+		else if (ballY + BALL_RADIUS > APPLICATION_HEIGHT) {
+			ballInPlay = false;
+		}
+	}
+	
+	// check 4 points if colliding with paddle or brick
+	// Delete brick
+	// Paddle: reveres direction of ball
+	private void collisions(double ballX, double ballY) {
+		double ball_diameter = 2 * BALL_RADIUS;
+		if (getCollidingObject(ballX, ballY) != null) {
+			collisionEffects(ballX, ballY);
+		}
+		
+		else if (getCollidingObject(ballX + ball_diameter, ballY) != null) {
+			collisionEffects(ballX + ball_diameter, ballY);
+		}
+		
+		else if (getCollidingObject(ballX, ballY + ball_diameter) != null) {
+			collisionEffects(ballX, ballY + ball_diameter);
+		}
+		
+		else if (getCollidingObject(ballX + ball_diameter, 
+				ballY + ball_diameter) != null) {
+			collisionEffects(ballX + ball_diameter, 
+					ballY + ball_diameter);
+		}
+	}
+	
+	private GObject getCollidingObject(double x, double y) {
+		GObject collider = (getElementAt(ball.getX(),ball.getY()));
+		return(collider);
+	}
+	
+	private void collisionEffects(double x, double y) {
+		GObject collider = getCollidingObject(x, y);
+		vy = -vy;
+		if (collider != paddle) {
+			remove(collider);
+			bricksLeft -= 1;}
+		println(bricksLeft);
+	}
+
+	
 	// PlaceGameObjects creates and places bricks, paddle and ball on screen
 	// ResetGameStats sets turnsLeft to 0 
 	private void SetUpGameInitialy() {
 		// set screen size
 		setSize(APPLICATION_WIDTH, APPLICATION_HEIGHT);
 		PlaceGameObjects();
-		ResetGameStats();
 		addMouseListeners();
-	}
-	
-	
-	// ResetGameStats set turnsLeft to 0 
-	private int ResetGameStats() {
-		int turnsLeft = 3;
-		return (turnsLeft);
 	}
 	
 	// calls helper functions that create and place each of the game objects
@@ -149,7 +230,7 @@ public class Breakout extends GraphicsProgram {
 	private void makeRow(int currentRowNum) {
 		// Getting initial values for row
 		double xBrick = getFirstBrickOffset();
-		int yBrick = getYBrick(currentRowNum);
+		int yBrick = getBrickY(currentRowNum);
 		// color changes every other row
 		Color rowColor = colorArray[currentRowNum / 2 ]; 
 		for (int i = 0; i < NBRICKS_PER_ROW; i++) {
@@ -178,33 +259,31 @@ public class Breakout extends GraphicsProgram {
 	}
 	
 	// gives y value for bricks in the given row
-	private int getYBrick(int currentRowNum) {
+	private int getBrickY(int currentRowNum) {
 		return (currentRowNum * (BRICK_HEIGHT + BRICK_SEP) + BRICK_Y_OFFSET);
 	}
 	
 	
 	private void PlacePaddle() {
-		double xPaddle = getXPaddle();
-		double yPaddle = getYPaddle();
+		double xPaddle = getPaddleX();
+		double yPaddle = getPaddleY();
 		paddle = placeRect(xPaddle, yPaddle, PADDLE_WIDTH, PADDLE_HEIGHT, Color.black);
 		add(paddle);
 	}	
 	  
-	private double getXPaddle() {
+	private double getPaddleX() {
 		double screenMidpoint = WIDTH / 2;
 		double halfPaddleLength =  PADDLE_WIDTH / 2;
 		double xPaddle = screenMidpoint - halfPaddleLength;
 		return (xPaddle);
 	}
 	
-	private double getYPaddle() {
+	private double getPaddleY() {
 		return(HEIGHT - PADDLE_Y_OFFSET);
 	}
 	
 	private void PlaceBall() {
-		double xBall = (WIDTH / 2) - BALL_RADIUS;
-		double yBall = (APPLICATION_HEIGHT / 2) - BALL_RADIUS;
-		GOval ball = new GOval(xBall, yBall, BALL_RADIUS, BALL_RADIUS);
+		ball = new GOval(BALL_START_X, BALL_START_Y, BALL_RADIUS, BALL_RADIUS);
 		ball.setFilled(true);
 		add(ball);
 	}
@@ -226,5 +305,13 @@ public class Breakout extends GraphicsProgram {
 		paddle.setLocation(xPaddle, (HEIGHT - PADDLE_Y_OFFSET));
 		
 	}
+	
+	/*** instance variables */
+	private double vx, vy;
+	private  GRect paddle;
+	private GOval ball;
+	private RandomGenerator rgen = RandomGenerator.getInstance();
+	
+	
 
 }
